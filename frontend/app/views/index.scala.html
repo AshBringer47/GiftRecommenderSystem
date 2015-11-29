@@ -1,0 +1,17 @@
+@(title: String)(javascripts: Seq[String])
+
+@basic(title)(javascripts) {
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12" ng-view></div>
+        </div>
+    </div>
+
+    <footer>
+        <hr/>
+        <div>
+            <span>&copy; 2015 @title</span>
+            <span app-version></span>
+        </div>
+    </footer>
+}
