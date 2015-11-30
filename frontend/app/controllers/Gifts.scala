@@ -25,18 +25,20 @@ class Gifts @Inject() (ws: WSClient) extends Controller with MongoController {
   import models._
   import models.JsonFormats._
 
-  def findGifts(user: User) = Action.async(parse.json) {
-    val backendUrl = (current.configuration getString "giftsRecommenderBackEnd.url").get
-    val addUserTask = Json.obj(
-      "task" -> "addUser",
-      "data" -> Json.obj(
-        "userProfile" -> user
-        )
-      )
-    val s = (ws url backendUrl)
-      .withHeaders("Accept" -> "application/json")
-      .withRequestTimeout(10000)
-      .post(addUserTask)
-    //Ok("s")
+  def findGifts = Action.async(parse.json) {
+    request =>
+      request.body.validate[User].map {
+        user =>
+          val backendUrl = current.configuration getString "giftsRecommenderBackEnd.url"
+          val addUserRequest = Json.obj(
+            "task" -> "addUser",
+            "data" -> Json.obj("userProfile" -> user)
+          )
+          (ws url backendUrl.get)
+            .withHeaders("Accept" -> "application/json")
+            .withRequestTimeout(10000)
+            .post(addUserRequest)
+            .map(resp => Ok(resp.body))
+      }.getOrElse(Future.successful(BadRequest("invalid json")))
   }
 }
