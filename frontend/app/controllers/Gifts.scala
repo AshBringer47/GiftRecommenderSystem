@@ -38,7 +38,7 @@ class Gifts @Inject() (ws: WSClient) extends Controller with MongoController {
             .withHeaders("Accept" -> "application/json")
             .withRequestTimeout(10000)
             .post(addUserRequest)
-            .map(resp => Ok(resp.body))
-      }.getOrElse(Future.successful(BadRequest("invalid json")))
+            .map(resp => if (resp.status == OK) Ok(resp.body) else Status(resp.status))
+      }.getOrElse(Future successful BadRequest("invalid json"))
   }
 }
