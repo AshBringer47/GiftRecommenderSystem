@@ -1,5 +1,27 @@
 /* Global Styles */
 
+nav#index-nav {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+div.intro-content > .brand-name, .intro-content > .brand-name-subtext {
+    font-family: 'Kaushan Script', cursive;
+}
+
+nav .fa-gift {
+    font-size: 2.2em;
+}
+
+div.intro-content > .fa-gift {
+    font-size: 12em;
+}
+
 header {
     background-image: url(../images/index-bg2d.jpg);
+}
+
+footer.footer {
+    background: linear-gradient( rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6) ), url(../images/contacts-3.jpg);
+    color: snow;
 }

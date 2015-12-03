@@ -25,20 +25,78 @@ class Gifts @Inject() (ws: WSClient) extends Controller with MongoController {
   import models._
   import models.JsonFormats._
 
+  private val serviceUrl = (current.configuration getString "giftsRecommenderBackEnd.url").get
+
   def findGifts = Action.async(parse.json) {
-    request =>
-      request.body.validate[User].map {
-        user =>
-          val backendUrl = current.configuration getString "giftsRecommenderBackEnd.url"
-          val addUserRequest = Json.obj(
-            "task" -> "addUser",
-            "data" -> Json.obj("userProfile" -> user)
-          )
-          (ws url backendUrl.get)
-            .withHeaders("Accept" -> "application/json")
-            .withRequestTimeout(10000)
-            .post(addUserRequest)
-            .map(resp => if (resp.status == OK) Ok(resp.body) else Status(resp.status))
-      }.getOrElse(Future successful BadRequest("invalid json"))
+    _.body.validate[User].map {
+      user =>
+        val addUserRequestJson = Json.obj(
+          "task" -> "addUser",
+          "data" -> Json.obj("userProfile" -> user)
+        )
+        val serviceRequestHolder = (ws url serviceUrl).withHeaders("Content-Type" -> "application/json")
+        serviceRequestHolder.post(addUserRequestJson).map {
+          response =>
+            if (response.status != OK)
+              Status(response.status)
+            else {
+              val json = response.json
+              val result = (json \ "result").as[String]
+              if (result == "Success")
+                makeListRequest(Json.obj(
+                  "filter" -> Json.obj("minPrice" -> 0, "maxPrice" -> 1000),
+                  "userId" -> json \ "data" \ "userId"
+                ))
+              else
+                InternalServerError
+            }
+        }
+    }.getOrElse(Future successful BadRequest("invalid json"))
+  }
+
+  private def makeListRequest(data: JsValue) : Status = {
+    val makeListJson = Json.obj(
+      "task" -> "makeList",
+      "data" -> data
+    )
+    val serviceRequestHolder = (ws url serviceUrl).withHeaders("Content-Type" -> "application/json")
+    serviceRequestHolder.post(makeListJson).map {
+      response =>
+        if (response.status != OK)
+          Status(response.status)
+        else {
+          val json = response.json
+          val result = (json \ "result").as[String]
+          if (result == "Success") {
+            val pages = (json \ "data" \ "numberOfPages").as[Int]
+
+          }
+          else
+            InternalServerError
+        }
+    }
+  }
+
+  private def getSuggestionsRequest(data: JsValue) : Status = {
+    val makeListJson = Json.obj(
+      "task" -> "makeList",
+      "data" -> data
+    )
+    val serviceRequestHolder = (ws url serviceUrl).withHeaders("Content-Type" -> "application/json")
+    serviceRequestHolder.post(makeListJson).map {
+      response =>
+        if (response.status != OK)
+          Status(response.status)
+        else {
+          val json = response.json
+          val result = (json \ "result").as[String]
+          if (result == "Success") {
+            val pages = (json \ "data" \ "numberOfPages").as[Int]
+
+          }
+          else
+            InternalServerError
+        }
+    }
   }
 }

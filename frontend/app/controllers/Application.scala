@@ -34,7 +34,7 @@ class Application @Inject() (uuidGenerator: UUIDGenerator) extends Controller {
       }
     }
 
-    Ok(views.html.index("Gifts Recommender")(javascripts))
+    Ok(views.html.index("GiReCo")(javascripts))
   }
 
   private def findScripts(base: File): Seq[String] = {

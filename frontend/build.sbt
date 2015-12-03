@@ -38,6 +38,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "font-awesome" % "4.5.0",
   "org.webjars" % "animate.css" % "3.3.0",
   "org.webjars" % "retinajs" % "1.3.0",
+  "org.webjars" % "mixitup" % "2.1.7",
+  "org.webjars" % "WOW" % "1.1.2",
   "org.webjars.bower" % "owl.carousel" % "2.0.0-beta.3",
   "org.webjars.bower" % "magnific-popup" % "1.0.0",
 
